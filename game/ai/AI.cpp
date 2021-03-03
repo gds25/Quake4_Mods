@@ -3684,20 +3684,41 @@ void idAI::OnDeath( void ){
 
 	ExecScriptFunction( funcs.death );
 
-/* DONT DROP ANYTHING FOR NOW
-	float rVal = gameLocal.random.RandomInt( 100 );
+// AI has a 10% chance of dropping one of 5 powerups (2% chance each)
 
+	int rVal = gameLocal.random.RandomInt( 50 );
+	
 	if( spawnArgs.GetFloat( "no_drops" ) >= 1.0 ){
 		spawnArgs.Set( "def_dropsItem1", "" );
 	}else{
-		// Fixme!  Better guys should drop better stuffs!  Make drops related to guy type?  Do something cooler here?
-		if( rVal < 25 ){	// Half of guys drop nothing?
-			spawnArgs.Set( "def_dropsItem1", "" );
-		}else if( rVal < 50 ){
-			spawnArgs.Set( "def_dropsItem1", "item_health_small" );
+		switch (rVal) {
+			case 0:
+				spawnArgs.Set("def_dropsItem1", "item_health_small");
+				//gameLocal.Printf("drop health\n");
+				break;
+			case 1:
+				spawnArgs.Set("def_dropsItem1", "item_armor_small_sp");
+				//gameLocal.Printf("drop armor\n");
+				break;
+			case 2:
+				spawnArgs.Set("def_dropsItem1", "powerup_quad_damage");
+				//gameLocal.Printf("drop dmg\n");
+				break;
+			case 3:
+				spawnArgs.Set("def_dropsItem1", "powerup_haste");
+				//gameLocal.Printf("drop haste\n");
+				break;
+			case 4:
+				spawnArgs.Set("def_dropsItem1", "powerup_invisibility");
+				//gameLocal.Printf("drop invis\n");
+				break;
+			default:
+				spawnArgs.Set("def_dropsItem1", "");
+				break;
 		}
-	}
-*/
+
+		}
+
 }
 
 /*
