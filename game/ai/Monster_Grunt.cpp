@@ -213,7 +213,7 @@ void rvMonsterGrunt::OnTacticalChange ( aiTactical_t oldTactical ) {
 			break;
 
 		default:
-			actionRangedAttack.fl.disabled = false;
+			actionRangedAttack.fl.disabled = true; //disables ranged attack
 			break;
 	}
 }
@@ -226,7 +226,7 @@ rvMonsterGrunt::AdjustHealthByDamage
 void rvMonsterGrunt::AdjustHealthByDamage ( int damage ) {
 	// Take less damage during enrage process 
 	if ( rageThreshold && health < rageThreshold ) { 
-		health -= (damage * 0.25f);
+		health -= (damage * 0.75f); //from 0.25f, make grunt less tanky
 		return;
 	}
 	return idAI::AdjustHealthByDamage ( damage );

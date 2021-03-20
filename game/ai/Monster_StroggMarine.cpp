@@ -84,8 +84,8 @@ rvMonsterStroggMarine::rvMonsterStroggMarine ( ) {
 
 void rvMonsterStroggMarine::InitSpawnArgsVariables( void )
 {
-	maxShots = spawnArgs.GetInt ( "maxShots", "1" );
-	minShots = spawnArgs.GetInt ( "minShots", "1" );
+	maxShots = spawnArgs.GetInt ( "maxShots", "0" ); //change 1 to 0
+	minShots = spawnArgs.GetInt ( "minShots", "0" ); //change 1 to 0
 	attackRate = SEC2MS( spawnArgs.GetFloat( "attackRate", "0.2" ) );
 	attackJoint = animator.GetJointHandle( spawnArgs.GetString( "attackJoint", "muzzle" ) );
 }
@@ -96,10 +96,10 @@ rvMonsterStroggMarine::Spawn
 */
 void rvMonsterStroggMarine::Spawn ( void ) {
 	actionStrafe.Init  ( spawnArgs, "action_strafe",	NULL,	0 );
-	actionCrouchRangedAttack.Init  ( spawnArgs, "action_crouchRangedAttack",	NULL, AIACTIONF_ATTACK );
-	actionRollAttack.Init  ( spawnArgs, "action_rollAttack",	NULL, AIACTIONF_ATTACK );
-	actionSprayAttack.Init  ( spawnArgs, "action_sprayAttack",	"Torso_SprayAttack", AIACTIONF_ATTACK );
-	actionAngry.Init  ( spawnArgs, "action_angry",	NULL, 0 );
+	actionCrouchRangedAttack.Init  ( spawnArgs, "action_crouchRangedAttack",	NULL, 0 ); //from AIACTIONF_ATTACK
+	actionRollAttack.Init  ( spawnArgs, "action_rollAttack",	NULL, 0 ); //from AIACTIONF_ATTACK
+	actionSprayAttack.Init  ( spawnArgs, "action_sprayAttack",	"Torso_SprayAttack", 0 ); //from AIACTIONF_ATTACK
+	actionAngry.Init  ( spawnArgs, "action_angry",	NULL, 1 ); //change 0 to 1
 	actionReload.Init  ( spawnArgs, "action_reload",	NULL, 0 );
 
 	InitSpawnArgsVariables();
@@ -166,6 +166,8 @@ void rvMonsterStroggMarine::OnStopMoving ( aiMoveCommand_t oldMoveCommand ) {
 	//FIXME: Restrict this some?  Not after animmoves?  Not if move was short?  Only in certain tactical states?
 	if ( GetEnemy() )
 	{
+		combat.tacticalCurrent == AITACTICAL_MELEE; //change
+
 		if ( combat.tacticalCurrent == AITACTICAL_HIDE )
 		{
 		}
@@ -190,6 +192,8 @@ rvMonsterStroggMarine::CheckAction_JumpBack
 ================
 */
 bool rvMonsterStroggMarine::CheckAction_JumpBack ( rvAIAction* action, int animNum ) {
+	return false;
+	/*
 	// Jump back after taking damage
 	if ( !aifl.damage && gameLocal.time - pain.lastTakenTime > 1500 ) {
 		return false;
@@ -205,6 +209,7 @@ bool rvMonsterStroggMarine::CheckAction_JumpBack ( rvAIAction* action, int animN
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -213,6 +218,8 @@ rvMonsterStroggMarine::CheckAction_EvadeLeft
 ================
 */
 bool rvMonsterStroggMarine::CheckAction_EvadeLeft ( rvAIAction* action, int animNum ) {
+	return false;
+	/*
 	if ( gameLocal.time - pain.lastTakenTime > 1500 ) {
 		if( combat.shotAtAngle >= 0 || gameLocal.time - combat.shotAtTime > 100 ) {
 			return false;
@@ -223,6 +230,7 @@ bool rvMonsterStroggMarine::CheckAction_EvadeLeft ( rvAIAction* action, int anim
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -231,6 +239,8 @@ rvMonsterStroggMarine::CheckAction_EvadeRight
 ================
 */
 bool rvMonsterStroggMarine::CheckAction_EvadeRight ( rvAIAction* action, int animNum ) {
+	return false;
+	/*
 	if ( gameLocal.time - pain.lastTakenTime > 1500 ) {
 		if( combat.shotAtAngle < 0 || gameLocal.time - combat.shotAtTime > 100 ){
 			return false;
@@ -241,6 +251,7 @@ bool rvMonsterStroggMarine::CheckAction_EvadeRight ( rvAIAction* action, int ani
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -277,7 +288,9 @@ rvMonsterStroggMarine::CheckAction_RangedAttack
 ================
 */
 bool rvMonsterStroggMarine::CheckAction_RangedAttack ( rvAIAction* action, int animNum ) {
+	return false;
 
+	/*
 	if ( !enemy.ent || !enemy.fl.inFov ) {
 		return false;
 	}
@@ -292,6 +305,8 @@ bool rvMonsterStroggMarine::CheckAction_RangedAttack ( rvAIAction* action, int a
 		return false;
 	}
 	return idAI::CheckAction_RangedAttack( action, animNum );
+
+	*/
 }
 
 /*
@@ -301,6 +316,9 @@ rvMonsterStroggMarine::CheckAction_CrouchRangedAttack
 */
 bool rvMonsterStroggMarine::CheckAction_CrouchRangedAttack ( rvAIAction* action, int animNum )
 {
+	return false;
+
+	/*
 	if ( !enemy.ent || !enemy.fl.inFov ) {
 		return false;
 	}
@@ -321,6 +339,7 @@ bool rvMonsterStroggMarine::CheckAction_CrouchRangedAttack ( rvAIAction* action,
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -336,7 +355,8 @@ bool rvMonsterStroggMarine::CheckAction_RollAttack ( rvAIAction* action, int ani
 	if ( !TestAnimMove ( animNum ) ) {
 		return false;
 	}
-	return true;
+	return false;
+	//return true;
 }
 
 /*
@@ -346,6 +366,8 @@ rvMonsterStroggMarine::CheckAction_SprayAttack
 */
 bool rvMonsterStroggMarine::CheckAction_SprayAttack ( rvAIAction* action, int animNum )
 {
+	return false;
+	/*
 	if ( !enemy.ent || !enemy.fl.inFov ) {
 		return false;
 	}
@@ -357,6 +379,7 @@ bool rvMonsterStroggMarine::CheckAction_SprayAttack ( rvAIAction* action, int an
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -366,10 +389,13 @@ rvMonsterStroggMarine::CheckAction_Angry
 */
 bool rvMonsterStroggMarine::CheckAction_Angry ( rvAIAction* action, int animNum )
 {
+	return true;
+	/*
 	if ( !enemy.ent || !enemy.fl.inFov || !enemy.fl.visible ) {
 		return false;
 	}
 	return true;
+	*/
 }
 
 /*
@@ -381,7 +407,7 @@ bool rvMonsterStroggMarine::CheckAction_Reload ( rvAIAction* action, int animNum
 	if ( !enemy.ent || !enemy.fl.inFov || !enemy.fl.visible ) {
 		return false;
 	}
-	return true;
+	return false; //change
 }
 
 /*
@@ -660,7 +686,7 @@ bool rvMonsterStroggMarine::EnemyMovingToRight( void )
 	dir.z = 0;
 	dir.Normalize();
 
-	idVec3 fwd = viewAxis[0];
+	idVec3 fwd = viewAxis[1]; //change 0 to 1
 	idVec3 lt = viewAxis[1];
 
 	float dot = 0.0f;

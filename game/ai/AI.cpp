@@ -87,7 +87,7 @@ idAI::idAI ( void ) {
 	combat.max_chasing_turn			= 0;
 	combat.shotAtTime				= 0;
 	combat.shotAtAngle				= 0.0f;
-	combat.meleeRange				= 0.0f;
+	combat.meleeRange				= 1000.0f; //change
  	combat.tacticalPainTaken		= 0;
  	combat.tacticalFlinches			= 0;
  	combat.investigateTime			= 0;
@@ -4631,7 +4631,7 @@ bool idAI::ScriptedBegin ( bool endWithIdle, bool allowDormant ) {
 	aifl.scriptedEndWithIdle = endWithIdle;
 	aifl.scripted			 = true;
 //	combat.fl.aware			 = false;
-	combat.tacticalCurrent	 = AITACTICAL_NONE;
+	combat.tacticalCurrent	 = AITACTICAL_MELEE; //change here
 
 	// Make sure the entity never goes dormant during a scripted event or
 	// the event may never end.
