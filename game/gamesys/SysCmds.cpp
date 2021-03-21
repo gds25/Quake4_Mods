@@ -1130,8 +1130,11 @@ void Cmd_Spawn_f( const idCmdArgs &args ) {
 	}
 
 	yaw = player->viewAngles.yaw;
-
 	value = args.Argv( 1 );
+
+	gameLocal.Printf(args.Argv( 0 ));
+	gameLocal.Printf("\n");
+
 	dict.Set( "classname", value );
 	dict.Set( "angle", va( "%f", yaw + 180 ) );
 

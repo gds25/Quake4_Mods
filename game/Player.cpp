@@ -1766,6 +1766,12 @@ void idPlayer::Init( void ) {
 		teamDoublerPending = false;
 		teamDoubler = PlayEffect( "fx_doubler", renderEntity.origin, renderEntity.axis, true );
 	}
+
+	//initialize level
+	level = 0;
+
+	//spawn monster
+	MonsterSpawn("monster_grunt");
 }
 
 /*
@@ -14078,3 +14084,44 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+void idPlayer::LevelChange(){
+	level++;
+	gameLocal.Printf("Level ", level);
+	Event_SetHealth(100.f);
+}
+
+
+//stolen from SysCmds.cpp --> Cmd_Spawn_f() function
+void idPlayer::MonsterSpawn(const char *value) {
+	gameLocal.Printf("did this work");
+#ifndef _MPBETA
+	// const char *key, *value;
+	int			i;
+	float		yaw;
+	idVec3		org;
+	idPlayer	*player;
+	idDict		dict;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player || !gameLocal.CheatsOk(false)) {
+		return;
+	}
+
+	yaw = player->viewAngles.yaw;
+
+	dict.Set("classname", value);
+	dict.Set("angle", va("%f", yaw + 180));
+
+	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(0, 0, 1);
+	dict.Set("origin", org.ToString());
+
+	// kfuller: want to know the name of the entity I spawned
+	idEntity *newEnt = NULL;
+	gameLocal.SpawnEntityDef(dict, &newEnt);
+
+	if (newEnt)	{
+		gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
+	}
+#endif // !_MPBETA
+}

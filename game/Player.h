@@ -1117,6 +1117,13 @@ private:
 	void					InitWeapon			( void );
 	// RAVEN END
 
+	//level chages
+	int level;
+	void LevelChange();
+
+	//enemy spawning
+	void MonsterSpawn(const char *value);
+
 	bool					IsLegsIdle						( bool crouching ) const;
 	
 	stateResult_t			State_Wait_Alive				( const stateParms_t& parms );
