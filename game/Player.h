@@ -1123,6 +1123,7 @@ private:
 
 	//enemy spawning
 	void MonsterSpawn(const char *value);
+	void SpawnAll();
 
 	bool					IsLegsIdle						( bool crouching ) const;
 	

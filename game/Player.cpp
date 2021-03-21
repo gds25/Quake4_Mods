@@ -1767,11 +1767,11 @@ void idPlayer::Init( void ) {
 		teamDoubler = PlayEffect( "fx_doubler", renderEntity.origin, renderEntity.axis, true );
 	}
 
-	//initialize level
+	//initialize level var
 	level = 0;
 
 	//spawn monster
-	MonsterSpawn("monster_grunt");
+	//MonsterSpawn("monster_grunt");
 }
 
 /*
@@ -9649,6 +9649,11 @@ void idPlayer::Think( void ) {
 		inBuyZone = false;
 
 	inBuyZonePrev = false;
+
+	//checks to see if all enemies are dead
+	if (gameLocal.userSpawnedEntities == 0) {
+		LevelChange();
+	}
 }
 
 /*
@@ -14089,15 +14094,22 @@ void idPlayer::LevelChange(){
 	level++;
 	gameLocal.Printf("Level ", level);
 	Event_SetHealth(100.f);
+	SpawnAll();
 }
 
-
+void idPlayer::SpawnAll() {
+	for (int i = 0; i < level; i++){
+		MonsterSpawn("monster_grunt");
+		MonsterSpawn("monster_strogg_marine");
+		MonsterSpawn("monster_slimy_transfer");
+	}
+}
 //stolen from SysCmds.cpp --> Cmd_Spawn_f() function
 void idPlayer::MonsterSpawn(const char *value) {
-	gameLocal.Printf("did this work");
+	//gameLocal.Printf("did this work");
 #ifndef _MPBETA
 	// const char *key, *value;
-	int			i;
+	//int			i;
 	float		yaw;
 	idVec3		org;
 	idPlayer	*player;
@@ -14113,7 +14125,13 @@ void idPlayer::MonsterSpawn(const char *value) {
 	dict.Set("classname", value);
 	dict.Set("angle", va("%f", yaw + 180));
 
-	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(0, 0, 1);
+	//spawns mobs in a randomish position closeby
+	//todo: prevent monsters from spawning on top of each other??
+	//**mobs can spawn inside walls if you stay too close to one**//
+	int sign = gameLocal.random.RandomInt(1);
+	if (sign == 0)
+		org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(100 + gameLocal.random.RandomInt(100), 0, gameLocal.random.RandomInt(200));
+	else org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(-100 - gameLocal.random.RandomInt(100), 0, 0-gameLocal.random.RandomInt(200));
 	dict.Set("origin", org.ToString());
 
 	// kfuller: want to know the name of the entity I spawned
@@ -14122,6 +14140,7 @@ void idPlayer::MonsterSpawn(const char *value) {
 
 	if (newEnt)	{
 		gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
+		gameLocal.userSpawnedEntities++;
 	}
 #endif // !_MPBETA
 }

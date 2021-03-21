@@ -442,6 +442,11 @@ public:
 	int filterMod;
 	idList<idStr> modList;
 
+
+// create list of spawned enemies on level change
+	//idLinkList<idEntity>	
+	int userSpawnedEntities = 0;
+
 	// ---------------------- Public idGame Interface -------------------
 
 							idGameLocal();

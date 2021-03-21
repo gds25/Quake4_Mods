@@ -3718,7 +3718,8 @@ void idAI::OnDeath( void ){
 		}
 
 		}
-
+	// remove entity from user list on death
+	gameLocal.userSpawnedEntities--;
 }
 
 /*
