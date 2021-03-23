@@ -956,7 +956,8 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
  			if ( !gameLocal.world->spawnArgs.GetBool( "no_Weapons" ) || ( weaponName == "weapon_fists" ) ) {
  				if ( ( weapons & ( 1 << i ) ) == 0 || gameLocal.isMultiplayer ) {
 					if ( ( owner->GetUserInfo()->GetBool( "ui_autoSwitch" ) 
-						|| ( gameLocal.isMultiplayer && gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() ) )
+						//|| ( gameLocal.isMultiplayer && gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() ) 
+						)
 						&& idealWeapon && !checkOnly )
 					{
 						// client prediction should not get here
@@ -1772,6 +1773,12 @@ void idPlayer::Init( void ) {
 	midLevel = 0;
 	bossLevel = 0;
 
+	//initialize item shop
+	buyMenu = NULL;
+	//buyMenu = uiManager->FindGui("guis/buymenu.gui", true, false, true);
+	buyMenuCash = 0;
+	BuyMenu();
+	
 	//spawn monster
 	//MonsterSpawn("monster_grunt");
 }
@@ -14028,7 +14035,7 @@ void idPlayer::GiveCash( float cashDeltaAmount )
 
 	if( (int)buyMenuCash != (int)oldCash )
 	{
-		gameLocal.mpGame.RedrawLocalBuyMenu();
+		//gameLocal.mpGame.RedrawLocalBuyMenu();
 	}
 
 	if( (int)buyMenuCash > (int)oldCash )
@@ -14096,7 +14103,8 @@ void idPlayer::LevelChange(){
 	level++;
 	gameLocal.Printf("Level ", level, "\n");
 	Event_SetHealth(100.f);
-	//gameLocal.mpGame.OpenLocalBuyMenu();
+	GiveCash(100.0f);
+	UpdateBuyMenu();
 	SpawnAll();
 }
 
@@ -14104,9 +14112,10 @@ void idPlayer::SpawnAll() {
 	if (level % 5 == 0) {
 		bossLevel++;
 		//gameLocal.Printf("bosslevel", bossLevel.to_string(), "\n");
-		for (int i = 0; i < bossLevel; i++){
+		MonsterSpawn("monster_iron_maiden");
+		for (int i = 0; i < bossLevel*2; i++){
 			//gameLocal.Printf("bosslevel");
-			MonsterSpawn("monster_iron_maiden");
+			MonsterSpawn("monster_failed_transfer");
 		}
 	}
 	else if (level % 5 == 3) {
@@ -14164,6 +14173,141 @@ void idPlayer::MonsterSpawn(const char *value) {
 	if (newEnt)	{
 		//gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
 		gameLocal.userSpawnedEntities++;
+		if (value == "monster_iron_maiden")
+			StartBossBattle(newEnt);
 	}
 #endif // !_MPBETA
+}
+
+void idPlayer::UpdateBuyMenu() {
+	SetupBuyMenuItems();
+	UpdateHudStats(buyMenu);
+	buyMenu->HandleNamedEvent("update_buymenu");
+	buyMenu->SetStateString("field_credits", va("%i", buyMenuCash));
+	buyMenu->Redraw(gameLocal.time);
+}
+
+/*
+================
+idMultiplayerGame::StartMenu
+================
+*/
+void idPlayer::BuyMenu(void) {
+	
+	buyMenu = uiManager->FindGui("guis/buymenu.gui", true, false, true);
+
+	if (gameLocal.GetLocalPlayer()) {
+		gameLocal.GetLocalPlayer()->disableHud = true;
+	}
+
+		//if( mpClientGameState.gameState.currentState == COUNTDOWN ) {
+		//idPlayer* player = gameLocal.GetLocalPlayer();
+		buyMenu->SetStateString("field_credits", va("%i", buyMenuCash));
+		buyMenu->SetStateInt("price_shotgun", GetItemCost("weapon_shotgun"));
+		buyMenu->SetStateInt("price_hyperblaster", GetItemCost("weapon_hyperblaster"));
+		buyMenu->SetStateInt("price_grenadelauncher", GetItemCost("weapon_grenadelauncher"));
+		buyMenu->SetStateInt("price_nailgun", GetItemCost("weapon_nailgun"));
+		buyMenu->SetStateInt("price_rocketlauncher", GetItemCost("weapon_rocketlauncher"));
+		buyMenu->SetStateInt("price_railgun", GetItemCost("weapon_railgun"));
+		buyMenu->SetStateInt("price_lightninggun", GetItemCost("weapon_lightninggun"));
+		//			buyMenu->SetStateInt( "price_dmg", player->GetItemCost( "weapon_dmg" ) );
+		buyMenu->SetStateInt("price_napalmgun", GetItemCost("weapon_napalmgun"));
+
+		buyMenu->SetStateInt("price_lightarmor", GetItemCost("item_armor_small"));
+		buyMenu->SetStateInt("price_heavyarmor", GetItemCost("item_armor_large"));
+		buyMenu->SetStateInt("price_ammorefill", GetItemCost("ammorefill"));
+
+		buyMenu->SetStateInt("price_special0", GetItemCost("ammo_regen"));
+		buyMenu->SetStateInt("price_special1", GetItemCost("health_regen"));
+		buyMenu->SetStateInt("price_special2", GetItemCost("damage_boost"));
+		SetupBuyMenuItems();
+		buyMenu->Activate(true, gameLocal.time);
+		//return buyMenu;
+		//}
+		// RITUAL END
+
+	//return NULL;
+}
+
+void idPlayer::SetupBuyMenuItems()
+{
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (!player)
+		return;
+
+	buyMenu->SetStateInt("buyStatus_shotgun", ItemBuyStatus("weapon_shotgun"));
+	buyMenu->SetStateInt("buyStatus_hyperblaster", ItemBuyStatus("weapon_hyperblaster"));
+	buyMenu->SetStateInt("buyStatus_grenadelauncher", ItemBuyStatus("weapon_grenadelauncher"));
+	buyMenu->SetStateInt("buyStatus_nailgun", ItemBuyStatus("weapon_nailgun"));
+	buyMenu->SetStateInt("buyStatus_rocketlauncher", ItemBuyStatus("weapon_rocketlauncher"));
+	buyMenu->SetStateInt("buyStatus_railgun", ItemBuyStatus("weapon_railgun"));
+	buyMenu->SetStateInt("buyStatus_lightninggun", ItemBuyStatus("weapon_lightninggun"));
+	//	buyMenu->SetStateInt( "buyStatus_dmg", player->ItemBuyStatus( "weapon_dmg" ) );
+	buyMenu->SetStateInt("buyStatus_napalmgun", ItemBuyStatus("weapon_napalmgun"));
+
+	buyMenu->SetStateInt("buyStatus_lightarmor", ItemBuyStatus("item_armor_small"));
+	buyMenu->SetStateInt("buyStatus_heavyarmor", ItemBuyStatus("item_armor_large"));
+	buyMenu->SetStateInt("buyStatus_ammorefill", ItemBuyStatus("ammorefill"));
+
+	buyMenu->SetStateInt("buyStatus_special0", ItemBuyStatus("ammo_regen"));
+	buyMenu->SetStateInt("buyStatus_special1", ItemBuyStatus("health_regen"));
+	buyMenu->SetStateInt("buyStatus_special2", ItemBuyStatus("damage_boost"));
+
+	buyMenu->SetStateInt("playerTeam", team);
+
+	if (player->weapon)
+		buyMenu->SetStateString("ammoIcon", player->weapon->spawnArgs.GetString("inv_icon"));
+
+	buyMenu->SetStateInt("player_weapon", player->GetCurrentWeapon());
+}
+
+void idPlayer::DisableMenu(void) {
+		buyMenu->Activate(false, gameLocal.time);
+
+	if (gameLocal.GetLocalPlayer()) 
+		gameLocal.GetLocalPlayer()->disableHud = false;
+
+	}
+
+
+/*
+================
+idMultiplayerGame::HandleGuiCommands
+================
+*/
+const char* idPlayer::HandleBuyMenuCommands(const char *_menuCommand) {
+	idUserInterface	*currentGui;
+	// RAVEN BEGIN
+	// shouchard:  removed the code that deals with these variables
+	//const char		*voteValue;
+	//int				vote_clientNum;
+	// RAVEN END
+	int				icmd;
+	idCmdArgs		args;
+
+
+	if (!_menuCommand[0]) {
+		common->Printf("HandleBuyMenuCommands: empty command\n");
+		return "continue";
+	}
+
+
+	args.TokenizeString(_menuCommand, false);
+
+	for (icmd = 0; icmd < args.Argc();) {
+		const char *cmd = args.Argv(icmd++);
+
+		if (!idStr::Icmp(cmd, ";"))	{
+			continue;
+		}
+		else if (!idStr::Icmp(cmd, "close")) {
+			DisableMenu();
+			SpawnAll();
+			return NULL;
+		}
+		//RAVEN END
+		common->Printf("HandleBuyMenuCommands: '%s'	unknown\n", cmd);
+
+	}
+	return "continue";
 }

@@ -1127,6 +1127,14 @@ private:
 	void MonsterSpawn(const char *value);
 	void SpawnAll();
 
+	//initializes the item shop
+	idUserInterface* buyMenu;
+	void BuyMenu();
+	void SetupBuyMenuItems();
+	void UpdateBuyMenu();
+	void DisableMenu();
+	const char* HandleBuyMenuCommands(const char *_menuCommand);
+
 	bool					IsLegsIdle						( bool crouching ) const;
 	
 	stateResult_t			State_Wait_Alive				( const stateParms_t& parms );

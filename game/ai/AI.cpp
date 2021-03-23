@@ -3686,7 +3686,7 @@ void idAI::OnDeath( void ){
 
 // AI has a 10% chance of dropping one of 5 powerups (2% chance each)
 
-	int rVal = gameLocal.random.RandomInt( 50 );
+	int rVal = gameLocal.random.RandomInt( 20 );
 	
 	if( spawnArgs.GetFloat( "no_drops" ) >= 1.0 ){
 		spawnArgs.Set( "def_dropsItem1", "" );
