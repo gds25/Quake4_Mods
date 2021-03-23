@@ -3418,13 +3418,21 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	}
 		
 	temp = _hud->State().GetInt ( "player_armor", "-1" );
-	if ( temp != inventory.armor ) {
+	if ( temp != level ) {
 		_hud->SetStateInt ( "player_armorDelta", temp == -1 ? 0 : (temp - inventory.armor) );
-		_hud->SetStateInt ( "player_armor", inventory.armor );
+		if (inventory.armor == 0) {
+			_hud->SetStateInt("player_armor", level);
+		}
+		else _hud->SetStateInt("player_armor", inventory.armor);
 		_hud->SetStateFloat	( "player_armorpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.armor / (float)inventory.maxarmor ) );
 		_hud->HandleNamedEvent ( "updateArmor" );
 	}
-	
+	/*
+		temp = _hud->State().GetInt("player_level", "-1");
+	if (temp != level)
+	{
+		_hud->SetStateInt("player_level", level);
+	}*/
 	// Boss bar
 	if ( _hud->State().GetInt ( "boss_health", "-1" ) != (bossEnemy ? bossEnemy->health : -1) ) {
 		if ( !bossEnemy || bossEnemy->health <= 0 ) {
