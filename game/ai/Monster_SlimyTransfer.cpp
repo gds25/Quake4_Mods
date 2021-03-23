@@ -112,6 +112,8 @@ rvMonsterSlimyTransfer::OnDeath
 */
 void rvMonsterSlimyTransfer::OnDeath ( void ) {
 	StopEffect ( "fx_vomit_muzzle" );
+	// ensures that the mobs that the teleporter spawns does not count towards the total mob count on the map 
+	gameLocal.userSpawnedEntities++;
 	idAI::OnDeath ( );
 }
 

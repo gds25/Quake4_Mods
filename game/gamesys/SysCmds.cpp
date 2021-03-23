@@ -322,6 +322,8 @@ void Cmd_KillMonsters_f( const idCmdArgs &args ) {
 	// kill any projectiles as well since they have pointers to the monster that created them
 	KillEntities( args, idProjectile::GetClassType() );
 // RAVEN END
+
+	gameLocal.userSpawnedEntities = 0;
 }
 
 /*

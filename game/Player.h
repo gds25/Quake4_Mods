@@ -1119,6 +1119,8 @@ private:
 
 	//level chages
 	int level;
+	int midLevel;
+	int bossLevel;
 	void LevelChange();
 
 	//enemy spawning

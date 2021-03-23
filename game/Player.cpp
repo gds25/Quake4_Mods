@@ -1769,6 +1769,8 @@ void idPlayer::Init( void ) {
 
 	//initialize level var
 	level = 0;
+	midLevel = 0;
+	bossLevel = 0;
 
 	//spawn monster
 	//MonsterSpawn("monster_grunt");
@@ -14092,16 +14094,37 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 void idPlayer::LevelChange(){
 	level++;
-	gameLocal.Printf("Level ", level);
+	gameLocal.Printf("Level ", level, "\n");
 	Event_SetHealth(100.f);
+	//gameLocal.mpGame.OpenLocalBuyMenu();
 	SpawnAll();
 }
 
 void idPlayer::SpawnAll() {
-	for (int i = 0; i < level; i++){
-		MonsterSpawn("monster_grunt");
-		MonsterSpawn("monster_strogg_marine");
-		MonsterSpawn("monster_slimy_transfer");
+	if (level % 5 == 0) {
+		bossLevel++;
+		//gameLocal.Printf("bosslevel", bossLevel.to_string(), "\n");
+		for (int i = 0; i < bossLevel; i++){
+			//gameLocal.Printf("bosslevel");
+			MonsterSpawn("monster_iron_maiden");
+		}
+	}
+	else if (level % 5 == 3) {
+		midLevel++;
+		//gameLocal.Printf("midlevel ", midLevel);
+		MonsterSpawn("monster_teleport_dropper");
+		for (int i = 0; i < midLevel; i++){
+			//gameLocal.Printf("midlevel");
+			MonsterSpawn("monster_berserker");
+		}
+	}
+	else{
+		for (int i = 0; i < level; i++){
+			//gameLocal.SpawnEntityDef("monster_slimy_transfer", NULL);
+			MonsterSpawn("monster_grunt");
+			MonsterSpawn("monster_strogg_marine");
+			MonsterSpawn("monster_failed_transfer");
+		}
 	}
 }
 //stolen from SysCmds.cpp --> Cmd_Spawn_f() function
@@ -14139,7 +14162,7 @@ void idPlayer::MonsterSpawn(const char *value) {
 	gameLocal.SpawnEntityDef(dict, &newEnt);
 
 	if (newEnt)	{
-		gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
+		//gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
 		gameLocal.userSpawnedEntities++;
 	}
 #endif // !_MPBETA
