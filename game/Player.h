@@ -1135,6 +1135,8 @@ private:
 	void DisableMenu();
 	const char* HandleBuyMenuCommands(const char *_menuCommand);
 
+	idUserInterface* samplemenu;
+
 	bool					IsLegsIdle						( bool crouching ) const;
 	
 	stateResult_t			State_Wait_Alive				( const stateParms_t& parms );

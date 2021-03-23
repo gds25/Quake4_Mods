@@ -1777,8 +1777,10 @@ void idPlayer::Init( void ) {
 	buyMenu = NULL;
 	//buyMenu = uiManager->FindGui("guis/buymenu.gui", true, false, true);
 	buyMenuCash = 0;
-	BuyMenu();
+	//BuyMenu();
 	
+	samplemenu = uiManager->FindGui("guis/mpmain.gui", true, false, true);
+	samplemenu->Activate(true, gameLocal.time);
 	//spawn monster
 	//MonsterSpawn("monster_grunt");
 }
@@ -9661,6 +9663,9 @@ void idPlayer::Think( void ) {
 
 	//checks to see if all enemies are dead
 	if (gameLocal.userSpawnedEntities == 0) {
+		if (level == 0) {
+			BuyMenu();
+		}
 		LevelChange();
 	}
 }
@@ -14101,10 +14106,12 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 void idPlayer::LevelChange(){
 	level++;
-	gameLocal.Printf("Level ", level, "\n");
+	gameLocal.Printf("Level ");
+	gameLocal.Printf(va("%d", level));
+	gameLocal.Printf("\n");
 	Event_SetHealth(100.f);
 	GiveCash(100.0f);
-	UpdateBuyMenu();
+	//UpdateBuyMenu();
 	SpawnAll();
 }
 
@@ -14185,6 +14192,7 @@ void idPlayer::UpdateBuyMenu() {
 	buyMenu->HandleNamedEvent("update_buymenu");
 	buyMenu->SetStateString("field_credits", va("%i", buyMenuCash));
 	buyMenu->Redraw(gameLocal.time);
+	buyMenu->Activate(true, gameLocal.time);
 }
 
 /*
@@ -14197,7 +14205,7 @@ void idPlayer::BuyMenu(void) {
 	buyMenu = uiManager->FindGui("guis/buymenu.gui", true, false, true);
 
 	if (gameLocal.GetLocalPlayer()) {
-		gameLocal.GetLocalPlayer()->disableHud = true;
+		gameLocal.GetLocalPlayer()->disableHud = false;
 	}
 
 		//if( mpClientGameState.gameState.currentState == COUNTDOWN ) {
